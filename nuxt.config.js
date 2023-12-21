@@ -3,8 +3,23 @@
 // import dotenv from 'dotenv'
 // import {DIR_CONFIG} from './config/dirConfig'
 // import { CONST_ENV_TYPE } from './config/envConfig'
-
+// import axios from 'axios'
 require('dotenv').config()
+
+// const instance = axios.create()
+// instance.interceptors.request.use(
+//   function (config) {
+//     console.log('=============요청전==========')
+//     // 요청 성공 직전 호출됩니다.
+//     // axios 설정값을 넣습니다. (사용자 정의 설정도 추가 가능)
+//     config.headers.Authorization = 'KakaoAK 1f64fd2b5f780ced81e4e045f034fe9c'
+//     return config
+//   },
+//   function (error) {
+//     // 요청 에러 직전 호출됩니다.
+//     return Promise.reject(error)
+//   }
+// )
 
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -151,6 +166,11 @@ export default {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
     // baseURL: '/',
     proxy: true, // proxy 사용
+    headers: {
+      common: {
+        Authorization: 'KakaoAK 1f64fd2b5f780ced81e4e045f034fe9c',
+      },
+    },
   },
   proxy: {
     '/google': {

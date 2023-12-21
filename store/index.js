@@ -4,16 +4,30 @@ import Vuex, { Store } from 'vuex'
 
 import ASEETS_STORE from './modules/assetsStore.js'
 import JOIN_STORE from './modules/joinStore.js'
-import LOCATION_DATA from '~/static/json/location.json'
-import TEXT_LIST_DATA from '~/static/json/textList.json'
+// import LOCATION_DATA from '~/static/json/location.json'
+// import TEXT_LIST_DATA from '~/static/json/textList.json'
+import { randListAnswer } from '~/js/util'
 
 Vue.use(Vuex)
 const instance = axios.create()
+
+// axios.interceptors.request.use(
+//   function (config) {
+//     console.log('=============요청전==========')
+//     config.headers['Authorization'] = 'Bearer '
+//     return config
+//   },
+//   function (error) {
+//     return Promise.reject(error)
+//   }
+// )
+
 instance.interceptors.request.use(
   function (config) {
     console.log('=============요청전==========')
     // 요청 성공 직전 호출됩니다.
     // axios 설정값을 넣습니다. (사용자 정의 설정도 추가 가능)
+    // config.headers.Authorization = 'KakaoAK 1f64fd2b5f780ced81e4e045f034fe9c'
     return config
   },
   function (error) {
@@ -32,79 +46,74 @@ const createStore = () => {
   return new Store({
     state: {
       IS_LOADING: false,
-      LOCATION_CODE: LOCATION_DATA,
-      EVENT_DATA: {
-        LIST: null,
-        LIST_BACK: null,
-        MAKERS: [],
-        MAKERS_LIST: [],
-        DETAIL: {},
-        REVIEW: [],
-        PHOTOS: [],
-        PHOTOS_COMN: [],
+      QUIZ: {
+        COUNT: 0,
+        CATEGORY: '',
+        LIST: [],
+        ANSWER: [],
+        ANSWER_LIST: [],
+        IMAGE: [],
       },
-      VIEW_TEXT: {},
-      TEXT_LIST: TEXT_LIST_DATA,
     },
     getters: {},
     mutations: {
       // ----------- intro
 
-      MUTATIONS_LANGAGE_SET(state, payload) {
-        state.VIEW_TEXT = state.TEXT_LIST[payload]
-      },
-      MUTATIONS_MAP_LIST_FILTER(state, payload) {
-        if (!payload) {
-          return (state.EVENT_DATA.LIST = state.EVENT_DATA.LIST_BACK)
-        }
-        const filteredData = state.EVENT_DATA.LIST.filter(
-          (data) => data[payload.key] === payload.value
-        )
+      MUTATIONS_QUIZ_LIST(state, payload) {
+        state.QUIZ.LIST = payload.data
+        const cnt = 5
 
-        state.EVENT_DATA.LIST = filteredData
-      },
-      MUTATIONS_MAP_DETAIL(state, payload) {
-        state.EVENT_DATA.DETAIL = payload.detail
-        state.EVENT_DATA.REVIEW = payload.review
-        state.EVENT_DATA.PHOTOS = payload.photos
-        state.EVENT_DATA.PHOTOS_COMN = payload.photosComn
-      },
-      MUTATIONS_MAP_MAKERS_LIST(state, payload) {
-        state.EVENT_DATA.MAKERS_LIST = []
+        if (state.QUIZ.LIST.length > 0) {
+          // randListAnswer(state.QUIZ.LIST.length)
 
-        const filteredData = state.EVENT_DATA.MAKERS.filter(
-          (data) =>
-            data.position.lng >= payload.La.lo &&
-            data.position.lng <= payload.La.hi &&
-            data.position.lat >= payload.eb.lo &&
-            data.position.lat <= payload.eb.hi
-        )
+          // Math.floor(Math.random() * cnt - 1)
 
-        state.EVENT_DATA.MAKERS_LIST = filteredData
-      },
-      MUTATIONS_MAP_LIST(state, payload) {
-        state.EVENT_DATA.LIST = payload
-        state.EVENT_DATA.LIST_BACK = payload
-        state.EVENT_DATA.MAKERS = []
-        payload.forEach((v, i) => {
-          const mapData = {
-            position: {
-              lat: Number(v.mapy),
-              lng: Number(v.mapx),
-            },
-            // infoText: `${payload[i]?.title}`,
-            detailData: payload[i],
+          for (let i = 0; i < payload.params.limit; i++) {
+            const list = {
+              answer: null,
+              list: [],
+            }
+            list.answer = Math.floor(Math.random() * cnt)
+            list.list = randListAnswer(state.QUIZ.LIST.length, cnt)
+            state.QUIZ.ANSWER.push(list)
           }
 
-          state.EVENT_DATA.MAKERS.push(mapData)
-        })
+          // for (let i = 0; i < payload.params.limit; i++) {
+          //   isAnswer[i] = {
+          //     answer: Math.floor(Math.random() * state.QUIZ.LIST.length),
+          //     quiz: [],
+          //   }
+          //   for (let k = 0; k < 4; k++) {
+          //     isAnswer[i].quiz[k] = Math.floor(
+          //       Math.random() * state.QUIZ.LIST.length
+          //     )
+          //   }
+          // }
+
+          // for (let k = 0; k < state.QUIZ.LIST.length; k++) {
+          //   const isQuiz = Math.floor(Math.random() * state.QUIZ.LIST.length)
+          //   for (let t = 0; t < payload.params.limit; t++) {
+          //     if (isAnswer[t].answer !== isQuiz) {
+          //       isAnswer[t].quiz.push(isQuiz)
+          //       if (isAnswer[t].quiz.length === 4) break;
+          //     }
+          //   }
+          // }
+
+          state.QUIZ.CATEGORY = state.QUIZ.LIST[0]?.qc_idx
+          // state.QUIZ.ANSWER = lottoNum()
+        }
+      },
+      MUTATIONS_QUIZ_START(state, payload) {
+        state.QUIZ.IMAGE = payload?.documents
+        console.log(payload)
       },
     },
     actions: {
-      ACTION_MAP_DETAIL({ commit }, params) {
+      ACTION_QUIZ_LIST({ commit }, params) {
         this.$axios
           .get(
-            `${process.env.VUE_APP_API}?mode=detail&contentid=${params?.contentid}`,
+            `${process.env.VUE_APP_API}?mode=list&cate=${params?.cate}&limit=${params?.limit}&title=${params?.title}`,
             params,
             {
               header: {
@@ -114,47 +123,37 @@ const createStore = () => {
           )
           .then((res) => {
             console.log(res.data)
-            commit('MUTATIONS_MAP_DETAIL', res.data)
+            res.params = params
+            commit('MUTATIONS_QUIZ_LIST', res)
           })
           .catch((res) => {
             console.log('AXIOS FALSE', res)
           })
       },
-      ACTION_MAP_LIST({ commit }, params) {
-        let str = ''
-        let stDt = ''
-        let edDt = ''
-        let dos = ''
-        let gu = ''
-        if (params?.str) {
-          str = params.str
-        }
-        if (params?.stDt) {
-          stDt = new Date(params.stDt)
-            .toLocaleDateString()
-            .replace(/\./g, '')
-            .replace(/\s/g, '-')
-        }
-        if (params?.edDt) {
-          edDt = new Date(params.edDt)
-            .toLocaleDateString()
-            .replace(/\./g, '')
-            .replace(/\s/g, '-')
-        }
-        if (params?.do) {
-          dos = params.do
-        }
-        if (params?.gu) {
-          let gudata = ''
-          params?.gu.forEach((element) => {
-            gudata += element + '|'
-          })
-          gu = gudata
-        }
+      ACTION_GAME_START({ commit }, params) {
         this.$axios
           .get(
-            `${process.env.VUE_APP_API}?mode=list&str=${str}&stDt=${stDt}&edDt=${edDt}&do=${dos}&gu=${gu}`,
-            params,
+            `https://dapi.kakao.com/v2/search/image`,
+            { params },
+            {
+              headers: {
+                'Context-Type': 'application/json',
+              },
+            }
+          )
+          .then((res) => {
+            console.log(res)
+            commit('MUTATIONS_QUIZ_START', res.data)
+          })
+          .catch((res) => {
+            console.log('AXIOS FALSE', res)
+          })
+      },
+      ACTION_GAME_IMAGE_SAVE({ commit }, params) {
+        this.$axios
+          .get(
+            `${process.env.VUE_APP_API}?mode=save`,
+            { params },
             {
               header: {
                 'Context-Type': 'multipart/form-data',
@@ -163,7 +162,7 @@ const createStore = () => {
           )
           .then((res) => {
             console.log(res.data)
-            commit('MUTATIONS_MAP_LIST', res.data)
+            // commit('MUTATIONS_MAP_LIST', res.data)
           })
           .catch((res) => {
             console.log('AXIOS FALSE', res)
