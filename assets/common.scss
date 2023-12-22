@@ -1,6 +1,10 @@
 @charset "utf-8";
 @import 'variables.scss';
 
+html, body, #__nuxt, #__layout{
+  height:100%;
+}
+
 ul {
   list-style: none;
 }
@@ -40,6 +44,7 @@ ul {
 #__layout > div{
   position:relative;
   max-width: 760px;
+  height:100%;
   margin: 0 auto;
   background-color: #e4e8f4;
 }
@@ -48,7 +53,7 @@ ul {
   background-color: #e4e8f4;
   max-width: 760px;
   position: relative;
-  min-height: calc(100vh - 50px);
+  min-height: 100%;
   margin: 0 auto;
   color:$textCol1;
 }
@@ -210,6 +215,7 @@ ul {
     .el-input__inner {
       padding-right: 100px;
       box-shadow: 0 4px 7px rgba(182, 179, 213, 0.5);
+      border:1px solid #CBCCDB;
     }
     .search-btn {
       position: absolute;
@@ -223,9 +229,13 @@ ul {
     display:flex;
     align-items: center;
     width:100%;
+    margin-bottom:20px;
     .left{
-      width:calc(100% - 50px);
+      width:20%;
       margin-right:10px;
+    }
+    .right{
+      width:calc(80% - 10px);
     }
     .btn-filter{
       width:40px;
@@ -422,6 +432,18 @@ ul {
         position: fixed;
         z-index: 10;
         box-shadow: 0 5px 10px rgba(000, 000, 000, 0.2);
+      }
+    }
+    &.center{
+      width:fit-content;
+      height:fit-content;
+      left:50%;
+      top:50%;
+      transform:translate(-50%, -50%);
+      border-radius: 20px;
+      .btn-close{
+        right:0;
+        top:-50px;
       }
     }
     &.bottom{
@@ -787,6 +809,89 @@ ul {
       width:100%;
     }
   }
+  &-list{
+    display:flex;
+    justify-content: center;
+  }
+}
+
+.quiz{
+  &-wrap{
+    padding:50px 20px;
+    text-align: center;
+  }
+  &-tit{
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 50px;
+  }
+  &-img{
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 50px;
+  }
+}
+
+.answer{
+  font-size: 18px;
+  font-weight: 600;
+  .o{
+    color:$colPrimary;
+    margin-bottom: 20px;
+    &:before{
+      content:"O";
+      display:block;
+      font-size: 30px;
+      font-weight: 900;
+      color:$colPrimary;
+    }
+  }
+  .x{
+    color:$colPink;
+    margin-bottom: 20px;
+    &:before{
+      content:"X";
+      display:block;
+      font-size: 30px;
+      font-weight: 900;
+      color:$colPink;
+    }
+  }
+}
+
+.result{
+  padding:100px;
+  text-align: center;
+  .score{
+    font-size:18px;
+    font-weight: 600;
+    margin-bottom: 50px;
+    .color{
+      color:$colPrimary;
+    }
+  }
+  .text{
+    padding: 20px 0;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .btn-list{
+    margin-bottom: 50px;
+    .share{
+      width:50px;
+      height: 50px;
+      border-radius: 25px;
+      margin:0 5px;
+      &.kakao{
+        background: url('../static/images/kakao-share.png') no-repeat center / 100%;
+      }
+      &.link{
+        background: url('../static/images/link.svg') no-repeat center / 60%;
+        background-color: #afafaf;
+      }
+    }
+  }
 }
 
 //el
@@ -807,6 +912,7 @@ ul {
 
 .el-input__inner{
   border-radius: 10px !important;
+  box-shadow: 0 4px 7px rgba(182, 179, 213, 0.5);
 }
 
 .el-select .el-input__inner{
@@ -864,4 +970,11 @@ ul {
 .el-carousel__arrow i{
   font-size:18px;
   font-weight: 600;
+}
+
+.el-button--primary.is-plain{
+  color:$colPrimary !important;
+  &:hover{
+    background-color: #dcd7ff !important;
+  }
 }

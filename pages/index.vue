@@ -20,6 +20,55 @@
 
       </div>
     </div>
+    
+    <div class="content">
+      <div class="search-top">
+        <div class="left">
+          <el-select v-model="value" placeholder="정렬">
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
+        <div class="right">
+          <div class="search-wrap">
+            <form @submit.prevent="onClickListSearch">
+              <el-input v-model="search" placeholder=""></el-input>
+              <button type="submit" class="btn search-btn">
+                <i class="el-icon-search"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div v-if="list">
+        <ul class="thumb-list">
+          <li class="thumb-list--item" @click="modalShow = true">
+            <div class="thumb">
+              <img src="../static/images/Thumbnail.svg" alt="" />
+            </div>
+            <div class="text">
+              <div class="tit">제목</div>
+              <div class="info">설명</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="nodata">
+        <img src="../static/images/nodata.svg" alt="" />
+        퀴즈가 없어요.
+      </div>
+    </div>
+    <div class="modal" v-bind:class="{ show: modalShow }">
+      <div class="modal-dim" @click="modalShow = false"></div>
+      <div class="modal-con center">
+         <button type="button" class="btn btn-close" @click="modalShow = false">&times;</button>
+         <div class="btn-list">
+          <el-button type="primary">10개풀기</el-button>
+          <el-button type="primary">20개풀기</el-button>
+          <el-button type="primary">30개풀기</el-button>
+         </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -35,7 +84,19 @@ export default {
     return {
       isLimit: 10,
       isStart: true,
-      isNow: 0
+      isNow: 0,
+      list: true,
+
+      options: [{
+        value: '인기순',
+        label: '인기순'
+      }, {
+        value: '최신순',
+        label: '최신순'
+      }],
+      value: '인기순',
+      
+      modalShow: false,
     }
   },
   head() {
