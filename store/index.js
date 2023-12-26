@@ -204,6 +204,16 @@ const createStore = () => {
             console.log('AXIOS FALSE', res)
           })
       },
+      ACTION_QUIZ_INSERT({ commit }, params) {
+        this.$axios
+          .get(`${process.env.VUE_APP_API}`, { params })
+          .then((res) => {
+            console.log(res.data)
+          })
+          .catch((res) => {
+            console.log('AXIOS FALSE', res)
+          })
+      },
       ACTION_MAP_PLACE_ID({ commit }, params) {
         this.$axios
           .get(
