@@ -53,6 +53,7 @@ const createStore = () => {
         ANSWER: [],
         ANSWER_LIST: [],
         IMAGE: [],
+        GAME_LIST: [],
       },
     },
     getters: {},
@@ -105,7 +106,23 @@ const createStore = () => {
         }
       },
       MUTATIONS_QUIZ_START(state, payload) {
-        state.QUIZ.IMAGE = payload?.documents
+        const list = payload?.documents
+        // const listArray = []
+        // for (let i = 0; i < list.length; i++) {
+        //   if (
+        //     list[i]?.display_sitename !== '네이버블로그' &&
+        //     list[i]?.display_sitename !== 'Daum카페'
+        //   ) {
+        //     listArray.push(list[i])
+        //     break
+        //   }
+        // }
+        // state.QUIZ.IMAGE = listArray
+        state.QUIZ.IMAGE = list
+        console.log(payload)
+      },
+      MUTATIONS_GAME_LIST(state, payload) {
+        state.QUIZ.GAME_LIST = payload
         console.log(payload)
       },
     },
@@ -125,6 +142,25 @@ const createStore = () => {
             console.log(res.data)
             res.params = params
             commit('MUTATIONS_QUIZ_LIST', res)
+          })
+          .catch((res) => {
+            console.log('AXIOS FALSE', res)
+          })
+      },
+      ACTION_GAME_LIST({ commit }, params) {
+        this.$axios
+          .get(
+            `${process.env.VUE_APP_API}?mode=gameList`,
+            { params },
+            {
+              headers: {
+                'Context-Type': 'application/json',
+              },
+            }
+          )
+          .then((res) => {
+            console.log(res)
+            commit('MUTATIONS_GAME_LIST', res.data)
           })
           .catch((res) => {
             console.log('AXIOS FALSE', res)

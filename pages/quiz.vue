@@ -3,23 +3,22 @@
     <div class="quiz-wrap">
       <div class="quiz-tit">제목</div>
       <div class="quiz-img">
-        <img src="../static/images/Thumbnail.svg" alt="" />
+        <img :src="QUIZ.IMAGE && QUIZ.IMAGE.length > 0 && QUIZ.IMAGE[0]?.thumbnail_url ? QUIZ.IMAGE[0]?.thumbnail_url : ''" alt="" />
       </div>
-      <div class="btn-list">
-        <el-button type="primary">1</el-button>
-        <el-button type="primary">2</el-button>
-        <el-button type="primary">3</el-button>
-        <el-button type="primary">4</el-button>
-        <el-button type="primary">5</el-button>
+      <div v-if="QUIZ.ANSWER && QUIZ.ANSWER.length > 0 && QUIZ.ANSWER[isNow - 1] && QUIZ.ANSWER[isNow - 1]?.list" class="btn-list">
+        <div v-for="(v, i) in QUIZ.ANSWER[isNow - 1].list" :key="i">
+          <el-button type="primary" @click="onClickGameStartInit(i, QUIZ.ANSWER[isNow - 1]?.answer)">{{ QUIZ.LIST[v]?.qz_title }}</el-button>
+        </div>
       </div>
       <div class="answer">
-        <div class="o">
+        {{ isNow }} / {{ isLimit }}
+        <div v-if="isResult === 1" class="o">
           정답
         </div>
-        <div class="x">
+        <div v-if="isResult === 2" class="x">
           오답
         </div>
-        <el-button type="primary">다음</el-button>
+        <!-- <el-button type="primary">다음</el-button> -->
       </div>
     </div>
   </div>
@@ -39,6 +38,8 @@ export default {
       isStart: true,
       isNow: 0,
       list: true,
+      isResult: 0,
+      isAnsertResult: -1
     }
   },
   head() {
@@ -51,9 +52,15 @@ export default {
   },
   created() {
     this.onClickGameStart()
-
+    
   },
   mounted() {
+    this.isLimit = this.$route.query.limit
+    this.$nextTick(() => {
+      setTimeout(() => {
+        this.onClickGameStartInit()
+      }, 1000);
+    })
   },
   unmounted() {
     // document.removeEventListener('scroll', this.handlerScrollEvents);
@@ -65,12 +72,18 @@ export default {
       const params = {
         cate: this.$route.query.cate,
         title: encodeURI(this.$route.query.title),
-        limit: this.isLimit
+        limit: this.$route.query.limit
       }
       this.ACTION_QUIZ_LIST(params);
 
     },
     onClickGameStartInit(v, i) {
+
+      setTimeout(() => {
+        this.isResult = 0
+      }, 1000);
+
+
       console.log(v, i)
       this.isStart = false
       const isAnswer = this.QUIZ.ANSWER[this.isNow]?.answer
@@ -86,16 +99,22 @@ export default {
 
       if (v === i) {
         console.log('정답')
+        // this.isResult = 1
+        this.isAnsertResult++
         const saveParams = {
           idx : this.QUIZ.LIST[arrayOnce]?.idx,
-          image: this.QUIZ.IMAGE[0]?.image_url,
+          image: this.QUIZ.IMAGE[0]?.thumbnail_url,
           mode:'save'
         }
         this.ACTION_GAME_IMAGE_SAVE(saveParams)
       }
 
+      
 
-      if (this.isLimit === this.isNow) return alert('끝')
+
+      if (this.isLimit <= this.isNow) {
+        return this.$router.push(`/result?q=${this.isAnsertResult}&cate=${this.$route.query.cate}&title=${encodeURI(this.$route.query.title)}&limit=${this.$route.query.limit}`)
+      }
 
       this.ACTION_GAME_START(params)
       this.isNow++

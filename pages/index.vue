@@ -5,7 +5,7 @@
     </div>
     <div v-else>
       <div>
-        <img :src="QUIZ.IMAGE && QUIZ.IMAGE.length > 0 && QUIZ.IMAGE[0]?.image_url ? QUIZ.IMAGE[0]?.image_url : ''"
+        <img :src="QUIZ.IMAGE && QUIZ.IMAGE.length > 0 && QUIZ.IMAGE[0]?.thumbnail_url ? QUIZ.IMAGE[0]?.thumbnail_url : ''"
           width="100%" />
       </div>
       <div>
@@ -42,13 +42,14 @@
       </div>
       <div v-if="list">
         <ul class="thumb-list">
-          <li class="thumb-list--item" @click="modalShow = true">
+          <li v-for="(v,i) in QUIZ.GAME_LIST" :key="i" class="thumb-list--item" @click="onClickIsModal(v.idx, v.qz_name)">
             <div class="thumb">
-              <img src="../static/images/Thumbnail.svg" alt="" />
+              <img v-if="v.is_img" :src="v.is_img" alt="" />
+              <img v-else src="../static/images/Thumbnail.svg" alt="" />
             </div>
             <div class="text">
-              <div class="tit">제목</div>
-              <div class="info">설명</div>
+              <div class="tit">{{ v.qz_name }}</div>
+              <!-- <div class="info">설명</div> -->
             </div>
           </li>
         </ul>
@@ -63,9 +64,9 @@
       <div class="modal-con center">
          <button type="button" class="btn btn-close" @click="modalShow = false">&times;</button>
          <div class="btn-list">
-          <el-button type="primary">10개풀기</el-button>
-          <el-button type="primary">20개풀기</el-button>
-          <el-button type="primary">30개풀기</el-button>
+          <el-button type="primary" @click="onClickIsLimit(10)">10개풀기</el-button>
+          <el-button type="primary" @click="onClickIsLimit(20)">20개풀기</el-button>
+          <el-button type="primary" @click="onClickIsLimit(30)">30개풀기</el-button>
          </div>
       </div>
     </div>
@@ -97,6 +98,11 @@ export default {
       value: '인기순',
       
       modalShow: false,
+      startOption: {
+        cate : null,
+        title: null,
+        limit: null
+      }
     }
   },
   head() {
@@ -108,7 +114,7 @@ export default {
     ...mapState(['QUIZ']),
   },
   created() {
-    this.onClickGameStart()
+    this.ACTION_GAME_LIST()
 
   },
   mounted() {
@@ -118,7 +124,18 @@ export default {
   },
   methods: {
     ...mapMutations([]),
-    ...mapActions(['ACTION_QUIZ_LIST', 'ACTION_GAME_START', 'ACTION_GAME_IMAGE_SAVE']),
+    ...mapActions(['ACTION_QUIZ_LIST', 'ACTION_GAME_START', 'ACTION_GAME_IMAGE_SAVE', 'ACTION_GAME_LIST']),
+    onClickIsModal(i, v) {
+      this.modalShow = true
+      this.startOption = {
+        cate: i,
+        title: v,
+      }
+    },
+    onClickIsLimit(v) {
+      this.startOption.limit = v
+      this.$router.push(`/quiz?cate=${this.startOption.cate}&title=${this.startOption.title}&limit=${this.startOption.limit}`)
+    },
     onClickGameStart() {
       const params = {
         cate: this.$route.query.cate,

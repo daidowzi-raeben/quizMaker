@@ -78,6 +78,14 @@ export default {
       //   defer: true,
       // },
     ],
+    script: [
+      {
+        type: 'text/javascript',
+        src: 'https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js',
+        integrity:
+          'sha384-PFHeU/4gvSH8kpvhrigAPfZGBDPs372JceJq3jAXce11bVA6rMvGWzvP4fMQuBGL',
+      },
+    ],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
