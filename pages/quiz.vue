@@ -3,21 +3,36 @@
     <div class="quiz-wrap">
       <div class="quiz-tit">제목</div>
       <div class="quiz-img">
-        <img :src="QUIZ.IMAGE && QUIZ.IMAGE.length > 0 && QUIZ.IMAGE[0]?.thumbnail_url ? QUIZ.IMAGE[0]?.thumbnail_url : ''" alt="" />
+        <img
+          :src="
+            QUIZ.IMAGE && QUIZ.IMAGE.length > 0 && QUIZ.IMAGE[0]?.thumbnail_url
+              ? QUIZ.IMAGE[0]?.thumbnail_url
+              : ''
+          "
+          alt=""
+        />
       </div>
-      <div v-if="QUIZ.ANSWER && QUIZ.ANSWER.length > 0 && QUIZ.ANSWER[isNow - 1] && QUIZ.ANSWER[isNow - 1]?.list" class="btn-list">
-        <div v-for="(v, i) in QUIZ.ANSWER[isNow - 1].list" :key="i">
-          <el-button type="primary" @click="onClickGameStartInit(i, QUIZ.ANSWER[isNow - 1]?.answer)">{{ QUIZ.LIST[v]?.qz_title }}</el-button>
-        </div>
+      <div
+        v-if="
+          QUIZ.ANSWER &&
+          QUIZ.ANSWER.length > 0 &&
+          QUIZ.ANSWER[isNow - 1] &&
+          QUIZ.ANSWER[isNow - 1]?.list
+        "
+        class="btn-list"
+      >
+        <el-button
+          v-for="(v, i) in QUIZ.ANSWER[isNow - 1].list"
+          :key="i"
+          type="primary"
+          @click="onClickGameStartInit(i, QUIZ.ANSWER[isNow - 1]?.answer)"
+          >{{ QUIZ.LIST[v]?.qz_title }}</el-button
+        >
       </div>
       <div class="answer">
         {{ isNow }} / {{ isLimit }}
-        <div v-if="isResult === 1" class="o">
-          정답
-        </div>
-        <div v-if="isResult === 2" class="x">
-          오답
-        </div>
+        <div v-if="isResult === 1" class="o">정답</div>
+        <div v-if="isResult === 2" class="x">오답</div>
         <!-- <el-button type="primary">다음</el-button> -->
       </div>
     </div>
@@ -39,12 +54,12 @@ export default {
       isNow: 0,
       list: true,
       isResult: 0,
-      isAnsertResult: -1
+      isAnsertResult: -1,
     }
   },
   head() {
     return {
-      title: '퀴즈'
+      title: '퀴즈',
     }
   },
   computed: {
@@ -52,14 +67,13 @@ export default {
   },
   created() {
     this.onClickGameStart()
-    
   },
   mounted() {
     this.isLimit = this.$route.query.limit
     this.$nextTick(() => {
       setTimeout(() => {
         this.onClickGameStartInit()
-      }, 1000);
+      }, 1000)
     })
   },
   unmounted() {
@@ -67,22 +81,23 @@ export default {
   },
   methods: {
     ...mapMutations([]),
-    ...mapActions(['ACTION_QUIZ_LIST', 'ACTION_GAME_START', 'ACTION_GAME_IMAGE_SAVE']),
+    ...mapActions([
+      'ACTION_QUIZ_LIST',
+      'ACTION_GAME_START',
+      'ACTION_GAME_IMAGE_SAVE',
+    ]),
     onClickGameStart() {
       const params = {
         cate: this.$route.query.cate,
         title: encodeURI(this.$route.query.title),
-        limit: this.$route.query.limit
+        limit: this.$route.query.limit,
       }
-      this.ACTION_QUIZ_LIST(params);
-
+      this.ACTION_QUIZ_LIST(params)
     },
     onClickGameStartInit(v, i) {
-
       setTimeout(() => {
         this.isResult = 0
-      }, 1000);
-
+      }, 1000)
 
       console.log(v, i)
       this.isStart = false
@@ -102,24 +117,27 @@ export default {
         // this.isResult = 1
         this.isAnsertResult++
         const saveParams = {
-          idx : this.QUIZ.LIST[arrayOnce]?.idx,
+          idx: this.QUIZ.LIST[arrayOnce]?.idx,
           image: this.QUIZ.IMAGE[0]?.thumbnail_url,
-          mode:'save'
+          mode: 'save',
         }
         this.ACTION_GAME_IMAGE_SAVE(saveParams)
       }
 
-      
-
-
       if (this.isLimit <= this.isNow) {
-        return this.$router.push(`/result?q=${this.isAnsertResult}&cate=${this.$route.query.cate}&title=${encodeURI(this.$route.query.title)}&limit=${this.$route.query.limit}`)
+        return this.$router.push(
+          `/result?q=${this.isAnsertResult}&cate=${
+            this.$route.query.cate
+          }&title=${encodeURI(this.$route.query.title)}&limit=${
+            this.$route.query.limit
+          }`
+        )
       }
 
       this.ACTION_GAME_START(params)
       this.isNow++
-    }
-  }
+    },
+  },
 }
 </script>
 
